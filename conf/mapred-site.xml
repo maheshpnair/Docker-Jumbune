@@ -33,4 +33,15 @@
 		<value>file:/hdfs/mapred/local</value>
 		<final>true</final>
 	</property>
+	
+	
+	<property>
+		<name>mapreduce.map.memory.mb</name>
+		<value>1024</value>
+	</property>
+
+	<property>
+		<name>mapreduce.reduce.memory.mb</name>
+		<value>2048</value>
+	</property>
 </configuration>
