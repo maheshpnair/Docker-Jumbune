@@ -1,4 +1,4 @@
-# Apache Hadoop 2.x - Pseudo-Distributed Mode
+# Jumbune 1.4.1 Hadoop 2.4.1 Pseudo distributed
 **- Container run**
 
     root@ruo91:~# docker run -d --name="hadoop" -h "hadoop" \
