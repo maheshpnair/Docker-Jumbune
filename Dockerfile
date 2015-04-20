@@ -6,7 +6,7 @@ MAINTAINER Mahesh Nair <maheshp.nair@impetus.co.in>
 
 # Last Package Update & Install
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN apt-get update && apt-get install -y curl supervisor openssh-server net-tools iputils-ping nano
+RUN apt-get update && apt-get install -y curl supervisor openssh-server net-tools iputils-ping nano zip
 
 # JDK
 ENV JDK_URL http://download.oracle.com/otn-pub/java/jdk
@@ -40,7 +40,7 @@ ENV YARN_HOME $HADOOP_PREFIX
 RUN echo '# Hadoop' >> /etc/profile \
  && echo "export HADOOP_PREFIX=$HADOOP_PREFIX" >> /etc/profile \
  && echo 'export HADOOP_HOME=$HADOOP_PREFIX' >> /etc/profile \
- && echo 'export PATH=$PATH:$HADOOP_PREFIX/sbin' >> /etc/profile \
+ && echo 'export PATH=$PATH:$HADOOP_PREFIX/bin:$HADOOP_PREFIX/sbin' >> /etc/profile \
  && echo 'export HADOOP_MAPRED_HOME=$HADOOP_PREFIX' >> /etc/profile \
  && echo 'export HADOOP_COMMON_HOME=$HADOOP_PREFIX' >> /etc/profile \
  && echo 'export HADOOP_HDFS_HOME=$HADOOP_PREFIX' >> /etc/profile \
@@ -68,7 +68,7 @@ RUN cd /root && ssh-keygen -t dsa -P '' -f "/root/.ssh/id_dsa" \
  && cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys && chmod 644 /root/.ssh/authorized_keys
 
 # Name node foramt
-RUN hdfs namenode -format
+RUN $HADOOP_PREFIX/bin/hdfs namenode -format
 
 # Supervisor
 RUN mkdir -p /var/log/supervisor
@@ -104,14 +104,16 @@ ADD deploynRun.sh /root/deploynRun.sh
 RUN chmod +x /root/deploynRun.sh
 ADD cluster-configuration.properties /root/agent/cluster-configuration.properties
 
-# Root password
-
-#RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 RUN echo 'root:hadoop' |chpasswd
 EXPOSE 22 8042 8088 50070 50075 50090 8088 5555
 
+#Some tests
 RUN printenv
+RUN whereis hadoop
+
+#compatibility
+RUN rm /opt/$HADOOP_VERSION/bin/hadoop.cmd
 
 # Daemon
 CMD ["/usr/bin/supervisord"]

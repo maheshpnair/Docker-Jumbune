@@ -8,5 +8,7 @@ sleep 5
 cd $JUMBUNE_HOME/agent-distribution/
 nohup java -jar jumbune-remoting-1.4.1-agent.jar 5555 -verbose >/dev/null 2>&1 &
 sleep 5
-$HADOOP_HOME/bin/hadoop fs -put /root/data /data
+$HADOOP_HOME/bin/hadoop fs -put $JUMBUNE_HOME/examples/resources/data/PREPROCESSED/data1  /data
+sleep 5
+$HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
 sleep 5
