@@ -89,7 +89,7 @@ ENV JUMBUNE_HOME /root/jumbune
 ENV AGENT_HOME /root/agent
 RUN mkdir $JUMBUNE_HOME
 RUN mkdir $AGENT_HOME
-RUN echo '# Jumbune' >> /etc/profile \
+RUN echo '###Jumbune' >> /etc/profile \
  && echo "export JUMBUNE_HOME=$JUMBUNE_HOME" >> /etc/profile \
  && echo "export AGENT_HOME=$AGENT_HOME" >> /etc/profile
 RUN cat /etc/profile
@@ -99,14 +99,15 @@ RUN cat /etc/profile
 ADD http://www.textfiles.com/100/basicom5.phk /root/data
 
 #Jumbune jar 
-RUN wget -O /root/jumbune-dist-1.4.1-bin.jar  http://jumbune.org/jar/beta/jumbune-dist-1.4.1-bin.jar
+#RUN wget -O /root/jumbune-dist-1.4.1-bin.jar  /home/impadmin/s/jumbune-dist-1.4.1-bin.jar
+ADD jumbune-dist-1.4.1-bin.jar /root/jumbune-dist-1.4.1-bin.jar
 ADD deploynRun.sh /root/deploynRun.sh
 RUN chmod +x /root/deploynRun.sh
 ADD cluster-configuration.properties /root/agent/cluster-configuration.properties
 
 
 RUN echo 'root:hadoop' |chpasswd
-EXPOSE 22 8042 8088 50070 50075 50090 8088 5555
+EXPOSE 22 8042 8088 50070 50075 50090 8088 5555 9999
 
 #Some tests
 RUN printenv
