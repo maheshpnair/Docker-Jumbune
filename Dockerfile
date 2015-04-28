@@ -46,11 +46,15 @@ RUN echo '# Hadoop' >> /etc/profile \
  && echo 'export HADOOP_COMMON_HOME=$HADOOP_PREFIX' >> /etc/profile \
  && echo 'export HADOOP_HDFS_HOME=$HADOOP_PREFIX' >> /etc/profile \
  && echo 'export YARN_HOME=$HADOOP_PREFIX' >> /etc/profile 
-# adding configurations 
+
+# Adding Hadoop configurations 
 ADD conf/core-site.xml $HADOOP_PREFIX/etc/hadoop/core-site.xml
 ADD conf/hdfs-site.xml $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
 ADD conf/yarn-site.xml $HADOOP_PREFIX/etc/hadoop/yarn-site.xml
 ADD conf/mapred-site.xml $HADOOP_PREFIX/etc/hadoop/mapred-site.xml
+
+#House keeping
+RUN rm /opt/$HADOOP_VERSION/bin/hadoop.cmd
 
 # Adding JAVA_HOME to hadoop-env.sh and exposing JMX ports for monitoring
 RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/local/jdk:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
@@ -65,6 +69,7 @@ RUN echo 'export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_PREFIX/lib/native' >> $HAD
  && echo 'export HADOOP_OPTS=-Djava.library.path=$HADOOP_PREFIX/lib' >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh \
  && echo 'export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_PREFIX/lib/native' >> $HADOOP_PREFIX/etc/hadoop/yarn-env.sh \
  && echo 'export HADOOP_OPTS=-Djava.library.path=$HADOOP_PREFIX/lib' >> $HADOOP_PREFIX/etc/hadoop/yarn-env.sh
+
 # SSH keygen
 RUN cd /root && ssh-keygen -t dsa -P '' -f "/root/.ssh/id_dsa" \
  && cat /root/.ssh/id_dsa.pub >> /root/.ssh/authorized_keys && chmod 644 /root/.ssh/authorized_keys
@@ -77,7 +82,6 @@ RUN mkdir -p /var/log/supervisor
 ADD conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # SSH
-#RUN nohup /usr/sbin/sshd 2>&1 &
 RUN mkdir /var/run/sshd
 RUN sed -i 's/without-password/yes/g' /etc/ssh/sshd_config
 RUN sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
@@ -90,7 +94,7 @@ ENV JUMBUNE_HOME /root/jumbune
 ENV AGENT_HOME /root/agent
 RUN mkdir $JUMBUNE_HOME
 RUN mkdir $AGENT_HOME
-RUN echo '# Jumbune' >> /etc/profile \
+RUN echo '##Jumbune' >> /etc/profile \
  && echo "export JUMBUNE_HOME=$JUMBUNE_HOME" >> /etc/profile \
  && echo "export AGENT_HOME=$AGENT_HOME" >> /etc/profile
 RUN cat /etc/profile
@@ -99,20 +103,16 @@ RUN cat /etc/profile
 
 ADD http://www.textfiles.com/100/basicom5.phk /root/data
 
-#etching Jumbune jar and the depoy script
+#Fetching Jumbune jar and the depoy script
 RUN wget -O /root/jumbune-dist-1.4.1-bin.jar  http://www.jumbune.org/jar/beta/jumbune-dist-1.4.1-bin.jar
-#ADD jumbune-dist-1.4.1-bin.jar /root/jumbune-dist-1.4.1-bin.jar
 ADD conf/deploynRun.sh /root/deploynRun.sh
 ADD conf/sampleJson.json /root/sampleJson.json
 RUN chmod +x /root/deploynRun.sh
 ADD conf/cluster-configuration.properties /root/agent/cluster-configuration.properties
 
-#setting the username and password
+#Setting the username and password
 RUN echo 'root:hadoop' |chpasswd
 EXPOSE 22 8080:8080 50070 8088
-
-#House keeping
-RUN rm /opt/$HADOOP_VERSION/bin/hadoop.cmd
 
 # Daemon
 CMD ["/usr/bin/supervisord"]
