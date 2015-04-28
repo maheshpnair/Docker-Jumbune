@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y curl supervisor openssh-server net-tool
 
 # Installing JDK and adding JAVA HOME
 ENV JDK_URL http://download.oracle.com/otn-pub/java/jdk
-ENV JDK_VER 8u25-b17
-ENV JDK_VER2 jdk-8u25
+ENV JDK_VER 7u79-b15
+ENV JDK_VER2 jdk-7u79
 ENV JAVA_HOME /usr/local/jdk
 ENV PATH $PATH:$JAVA_HOME/bin
 RUN cd $SRC_DIR && curl -LO "$JDK_URL/$JDK_VER/$JDK_VER2-linux-x64.tar.gz" -H 'Cookie: oraclelicense=accept-securebackup-cookie' \
@@ -77,7 +77,7 @@ RUN $HADOOP_PREFIX/bin/hdfs namenode -format
 
 # Supervisor
 RUN mkdir -p /var/log/supervisor
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+ADD conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # SSH
 #RUN nohup /usr/sbin/sshd 2>&1 &
@@ -93,7 +93,7 @@ ENV JUMBUNE_HOME /root/jumbune
 ENV AGENT_HOME /root/agent
 RUN mkdir $JUMBUNE_HOME
 RUN mkdir $AGENT_HOME
-RUN echo '##Jumbune#############' >> /etc/profile \
+RUN echo '# Jumbune' >> /etc/profile \
  && echo "export JUMBUNE_HOME=$JUMBUNE_HOME" >> /etc/profile \
  && echo "export AGENT_HOME=$AGENT_HOME" >> /etc/profile
 RUN cat /etc/profile
@@ -105,8 +105,8 @@ ADD http://www.textfiles.com/100/basicom5.phk /root/data
 #etching Jumbune jar and the depoy script
 RUN wget -O /root/jumbune-dist-1.4.1-bin.jar  http://www.jumbune.org/jar/beta/jumbune-dist-1.4.1-bin.jar
 #ADD jumbune-dist-1.4.1-bin.jar /root/jumbune-dist-1.4.1-bin.jar
-ADD deploynRun.sh /root/deploynRun.sh
-ADD sampleJson.json /root/sampleJson.json
+ADD conf/deploynRun.sh /root/deploynRun.sh
+ADD conf/sampleJson.json /root/sampleJson.json
 RUN chmod +x /root/deploynRun.sh
 ADD conf/cluster-configuration.properties /root/agent/cluster-configuration.properties
 
